@@ -11,7 +11,7 @@ const client = new Client({
 const CHANNEL_IDS = [
   "1470717206705868851",
   "1470255943328596058",
-  "1425189805352030300"
+  "1471076208954576932"
 ];
 
 client.on("messageCreate", async (msg) => {
