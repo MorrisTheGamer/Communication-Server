@@ -12,14 +12,8 @@ const client = new Client({
 const app = express();
 app.use(express.json());
 
-const CHANNEL_IDS = [
-  "1470717206705868851",
-  "1425189805352030300",
-  "1471112158023516263"
-];
-
+const CHANNEL_IDS = ["1470717206705868851", "1425189805352030300", "1471112158023516263"];
 let messageHistory = []; 
-let lastSeenUsers = new Map(); 
 
 client.on("messageCreate", async (msg) => {
   if (msg.author.bot || !CHANNEL_IDS.includes(msg.channel.id)) return;
@@ -27,35 +21,28 @@ client.on("messageCreate", async (msg) => {
   messageHistory.push({ u: msg.author.username, t: msg.content });
   if (messageHistory.length > 20) messageHistory.shift();
 
-  // Discord-zu-Discord Spiegelung
   for (const id of CHANNEL_IDS) {
     if (id === msg.channel.id) continue;
     try {
       const channel = await client.channels.fetch(id);
       if (channel) await channel.send(`**${msg.author.username}**: ${msg.content}`);
-    } catch (e) { console.error("Discord Error", e); }
+    } catch (e) { console.error(e); }
   }
 });
 
-app.get("/3ds", (req, res) => {
-  lastSeenUsers.set(req.ip, Date.now());
-  for (let [ip, time] of lastSeenUsers) {
-    if (Date.now() - time > 30000) lastSeenUsers.delete(ip);
-  }
-  res.json({ online: lastSeenUsers.size, messages: messageHistory });
-});
+// Endpunkte für den 3DS
+app.get("/3ds", (req, res) => res.json({ messages: messageHistory }));
 
 app.post("/send", async (req, res) => {
   const { username, text } = req.body;
   if (!text) return res.sendStatus(400);
   for (const id of CHANNEL_IDS) {
-    try {
-      const channel = await client.channels.fetch(id);
-      if (channel) await channel.send(`**[MiiCord] ${username}**: ${text}`);
-    } catch (e) { console.error(e); }
+    const channel = await client.channels.fetch(id);
+    if (channel) await channel.send(`**[MiiCord] ${username}**: ${text}`);
   }
   res.sendStatus(200);
 });
 
-app.listen(process.env.PORT || 3000, () => console.log("MiiCord Server läuft auf Railway"));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, '0.0.0.0', () => console.log(`MiiCord läuft auf Port ${PORT}`));
 client.login(process.env.BOT_TOKEN);
