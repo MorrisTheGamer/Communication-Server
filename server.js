@@ -42,7 +42,7 @@ client.on("messageCreate", async (msg) => {
 // GET /3ds: Liefert reinen Text an die Konsole
 app.get("/3ds", (req, res) => {
   if (messageHistory.length === 0) {
-    return res.send("Noch keine Nachrichten...");
+    return res.send("currently no messages...");
   }
 
   // Wandelt das Array in einen String um: "User: Nachricht\nUser: Nachricht..."
@@ -69,7 +69,7 @@ app.post("/send", async (req, res) => {
   for (const id of CHANNEL_IDS) {
     try {
       const channel = await client.channels.fetch(id);
-      if (channel) await channel.send(`**[MiiCord] ${username}**: ${text}`);
+      if (channel) await channel.send(`**[MiiCord3DS] ${username}**: ${text}`);
     } catch (e) { console.error("Discord Relay Error:", e); }
   }
   
