@@ -24,8 +24,10 @@ client.on("messageCreate", async (msg) => {
   // Speichere Nachricht intern (u = username, t = text)
   messageHistory.push({ u: msg.author.username, t: msg.content });
   
-  // Behalte nur die letzten 15 Nachrichten, damit der 3DS-Bildschirm nicht überläuft
-  if (messageHistory.length > 15) messageHistory.shift();
+  // Behaltet die letzten 200 Nachrichten (NEU ,wegen der Scroll-Funktion)
+  const MAX_MESSAGES = 200;
+  if (messageHistory.length > MAX_MESSAGES) messageHistory.shift();
+
 
   // Cross-Platform Messaging: Sende Nachricht an die anderen Discord-Channels
   for (const id of CHANNEL_IDS) {
